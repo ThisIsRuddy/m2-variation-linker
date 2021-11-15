@@ -1,0 +1,21 @@
+{
+  "name": "m2-variation-linker-v2",
+  "version": "0.0.0",
+  "description": "A script for linker simple & configurable products in Magento.",
+  "scripts": {
+    "start:live": "node -r dotenv/config src/main.js dotenv_config_path=.env.production",
+    "start:staging": "node -r dotenv/config src/main.js dotenv_config_path=.env.staging",
+    "start:local": "node -r dotenv/config src/main.js dotenv_config_path=.env.local"
+  },
+  "devDependencies": {
+    "eslint": "~8.2.0",
+    "eslint-config-prettier": "~8.3.0",
+    "prettier": "~2.4.1"
+  },
+  "dependencies": {
+    "axios": "^0.24.0",
+    "csvtojson": "^2.0.10",
+    "dotenv": "^10.0.0",
+    "path": "^0.12.7"
+  }
+}
