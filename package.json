@@ -1,5 +1,5 @@
 {
-  "name": "m2-variation-linker-v2",
+  "name": "m2-variation-linker",
   "version": "0.0.0",
   "description": "A script for linker simple & configurable products in Magento.",
   "scripts": {
