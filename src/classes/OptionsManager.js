@@ -76,21 +76,17 @@ class OptionsManager {
         const uri = `/bulk/${bid}/status`;
         const {
             data: {
-                operations_list,
-                operation_count
+                operations_list
             }
         } = await magento.get(uri);
 
-        const isDone = operations_list.length === operation_count;
-        console.log(`Bulk options request:`, isDone ? 'Complete' : 'Still processing');
-
-        const result = operations_list.length === operation_count;
-        if (!result) {
+        const isDone = !operations_list.somes(op => op.status === 4);
+        if (!isDone) {
             await wait(10000);
             return await this._isBulkRequestComplete(bid);
         }
 
-        return result;
+        return isDone;
     }
 
     async linkOptions(attrCodes, relationships) {
