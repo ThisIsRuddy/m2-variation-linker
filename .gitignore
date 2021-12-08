@@ -12,6 +12,3 @@ build/
 .DS_Store
 .env.*
 !env.sample
-data/*
-!data/attributes.sample.csv
-!data/relationships.sample.csv

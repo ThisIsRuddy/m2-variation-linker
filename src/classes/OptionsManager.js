@@ -2,6 +2,7 @@ const magento = require('../lib/magento');
 const magentoBulk = require('../lib/magento-bulk');
 
 const secondsElapsedSince = require("../lib/secondsElapsedSince");
+const toChunks = require("../lib/toChunks");
 const wait = require("../lib/wait");
 const attributesRepo = require("../classes/AttributesRepository");
 
@@ -16,6 +17,14 @@ class OptionsManager {
 
         console.log(`Retrieved children - took ${secondsElapsedSince(start)}s.`);
         return items;
+    }
+
+    async _batchGetSimpleProducts(parentSku, skus) {
+        const chunks = toChunks(skus, 100);
+        console.log('Children chunks:', chunks.length);
+        const jobs = chunks.map(async (skusChunk) => await this._getSimpleProducts(parentSku, skusChunk));
+        const results = await Promise.all(jobs);
+        return results.flat();
     }
 
     async _getUniqueOptionsPayload(attrCodes, parentSku, simples) {
@@ -51,7 +60,7 @@ class OptionsManager {
 
     async _getOptionsPayload(attrCodes, relationships) {
         const {parentSku, children} = relationships;
-        const simples = await this._getSimpleProducts(parentSku, children);
+        const simples = await this._batchGetSimpleProducts(parentSku, children);
         return await this._getUniqueOptionsPayload(attrCodes, parentSku, simples);
     }
 
