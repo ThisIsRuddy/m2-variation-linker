@@ -82,7 +82,7 @@ class OptionsManager {
         } = await magento.get(uri);
 
         const isDone = operations_list.length === operation_count;
-        console.log(`Bulk options request: `, isDone ? 'Complete' : 'Still processing');
+        console.log(`Bulk options request:`, isDone ? 'Complete' : 'Still processing');
 
         const result = operations_list.length === operation_count;
         if (!result) {
