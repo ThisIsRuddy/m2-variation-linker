@@ -20,7 +20,7 @@ class OptionsManager {
     }
 
     async _batchGetSimpleProducts(parentSku, skus) {
-        const chunks = toChunks(skus, 100);
+        const chunks = toChunks(skus, 2000);
         console.log('Children chunks:', chunks.length);
         const jobs = chunks.map(async (skusChunk) => await this._getSimpleProducts(parentSku, skusChunk));
         const results = await Promise.all(jobs);
@@ -80,7 +80,7 @@ class OptionsManager {
             }
         } = await magento.get(uri);
 
-        const isDone = !operations_list.somes(op => op.status === 4);
+        const isDone = !operations_list.some(op => op.status === 4);
         if (!isDone) {
             await wait(10000);
             return await this._isBulkRequestComplete(bid);
