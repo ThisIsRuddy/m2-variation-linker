@@ -1,21 +1,22 @@
 #### Configurable Relationship Mapper
-This script was created to link simple products to configurable parents.
-
-This is an archaic script that has not been touched since 2017 and should be re-written into a bulk import once 2.4 is on the live store.
+This module provides functionality to link/unlink configurable products with their variations/simple skus. This is necessary as the existing options for linking are very slow and cumbersome. This module utilizes the Magento async bulk APIs to offer the simplest way to link products - a two column csv - how it should be!
 
 ##### Instructions
-###### setVariations
-- Check `files/variation-attributes.csv` contains all your expected attributes used for variations
-- Populate `files/relationships.csv` with the mappings required e.g. parent_sku + child_sku
+###### Setup environment config
+- Copy `.env.sample` to `.env.staging` (or which env you want to use)
+- Update the values to match your env by providing the base URI & required API keys
+
+###### Linking options + products
+- Check `data/attributes.csv` contains all your expected attributes which are used as variations
+- Populate `files/link.csv` with the mappings required e.g. parent_sku + child_sku
 - Run the script by executing:
-    - `php setVariations.php production`
-    - `php setVariations.php staging`
-    - `php setVariations.php local`
-    
-###### removeVariations
-- Check `files/variation-attributes.csv` contains all your expected attributes used for variations
-- Populate `files/relationships.csv` with the mappings required e.g. parent_sku + child_sku
+    - `yarn link:live`
+    - `yarn link:staging`
+    - `yarn link:local`
+
+###### Unlinking options + products
+- Populate `data/unlink.csv` with the parent_skus you want to clear the options + linked skus from
 - Run the script by executing:
-    - `php removeVariations.php production`
-    - `php removeVariations.php staging`
-    - `php removeVariations.php local`
+  - `yarn unlink:live`
+  - `yarn unlink:staging`
+  - `yarn unlink:local`
