@@ -14,4 +14,5 @@ build/
 !env.sample
 data/*
 !data/attributes.sample.csv
-!data/relationships.sample.csv
+!data/link.sample.csv
+!data/unlink.sample.csv

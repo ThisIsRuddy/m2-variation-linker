@@ -11,7 +11,7 @@ const parseCSVFromFile = async (filePath) => {
 }
 
 const getRelationsFromFile = async () => {
-    const rows = await parseCSVFromFile('../data/relationships.csv');
+    const rows = await parseCSVFromFile('../data/link.csv');
 
     const results = rows.reduce((acc, curr) => {
 
@@ -33,7 +33,7 @@ const getRelationsFromFile = async () => {
     return values;
 }
 
-const getVariationAttributesFromFile = async () => {
+const getAttributesFromFile = async () => {
     const rows = await parseCSVFromFile('../data/attributes.csv');
 
     const results = rows.map((r) => r.attribute_code);
@@ -46,10 +46,10 @@ const execute = async () => {
     const start = process.hrtime();
 
     const relationships = await getRelationsFromFile();
-    const variationAttrCodes = await getVariationAttributesFromFile();
+    const variationAttrCodes = await getAttributesFromFile();
 
-    await optionsManager.setupOptions(variationAttrCodes, relationships);
-    await relationManager.setupVariations(relationships);
+    await optionsManager.link(variationAttrCodes, relationships);
+    await relationManager.link(relationships);
 
     console.log(`Finished! - time taken: ${secondsElapsedSince(start)}s.`);
 }

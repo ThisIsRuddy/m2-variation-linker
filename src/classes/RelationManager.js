@@ -1,8 +1,7 @@
-const magento = require('../lib/magento');
 const magentoBulk = require('../lib/magento-bulk');
 
 const secondsElapsedSince = require("../lib/secondsElapsedSince");
-const wait = require("../lib/wait");
+const waitForBulkRequest = require("../lib/waitForBulkRequest");
 
 class RelationManager {
 
@@ -22,34 +21,14 @@ class RelationManager {
         return bulk_uuid;
     }
 
-    async setupVariations(relationships) {
+    async link(relationships) {
         const start = process.hrtime();
         const bulk_uuid = await this._linkVariations(relationships)
 
-        await this._isBulkRequestComplete(bulk_uuid);
+        await waitForBulkRequest(bulk_uuid);
 
         console.log(`Retrieved children - took ${secondsElapsedSince(start)}s.`);
         return 'Linking success!';
-    }
-
-    async _isBulkRequestComplete(bid) {
-        console.log('Checking bulk relation request:', bid);
-
-        const uri = `/bulk/${bid}/status`;
-
-        const {
-            data: {
-                operations_list
-            }
-        } = await magento.get(uri);
-
-        const isDone = !operations_list.some((op) => op.status === 4);
-        if (!isDone) {
-            await wait(10000);
-            return await this._isBulkRequestComplete(bid);
-        }
-
-        return isDone;
     }
 }
 

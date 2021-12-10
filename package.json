@@ -3,9 +3,12 @@
   "version": "0.0.0",
   "description": "A script for linker simple & configurable products in Magento.",
   "scripts": {
-    "start:live": "node -r dotenv/config src/main.js dotenv_config_path=.env.production",
-    "start:staging": "node -r dotenv/config src/main.js dotenv_config_path=.env.staging",
-    "start:local": "node -r dotenv/config src/main.js dotenv_config_path=.env.local"
+    "link:live": "node -r dotenv/config src/link.js dotenv_config_path=.env.production",
+    "link:staging": "node -r dotenv/config src/link.js dotenv_config_path=.env.staging",
+    "link:local": "node -r dotenv/config src/link.js dotenv_config_path=.env.local",
+    "unlink:live": "node -r dotenv/config src/unlink.js dotenv_config_path=.env.production",
+    "unlink:staging": "node -r dotenv/config src/unlink.js dotenv_config_path=.env.staging",
+    "unlink:local": "node -r dotenv/config src/unlink.js dotenv_config_path=.env.local"
   },
   "devDependencies": {
     "eslint": "~8.2.0",

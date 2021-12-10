@@ -1,9 +1,8 @@
 const magento = require('../lib/magento');
 const magentoBulk = require('../lib/magento-bulk');
-
-const secondsElapsedSince = require("../lib/secondsElapsedSince");
 const toChunks = require("../lib/toChunks");
-const wait = require("../lib/wait");
+const secondsElapsedSince = require("../lib/secondsElapsedSince");
+const waitForBulkRequest = require("../lib/waitForBulkRequest");
 const attributesRepo = require("../classes/AttributesRepository");
 
 class OptionsManager {
@@ -70,26 +69,7 @@ class OptionsManager {
         return results.flat();
     }
 
-    async _isBulkRequestComplete(bid) {
-        console.log('Checking bulk options request:', bid);
-
-        const uri = `/bulk/${bid}/status`;
-        const {
-            data: {
-                operations_list
-            }
-        } = await magento.get(uri);
-
-        const isDone = !operations_list.some(op => op.status === 4);
-        if (!isDone) {
-            await wait(10000);
-            return await this._isBulkRequestComplete(bid);
-        }
-
-        return isDone;
-    }
-
-    async linkOptions(attrCodes, relationships) {
+    async _linkOptions(attrCodes, relationships) {
         const uri = `/configurable-products/bySku/options`;
         const payload = await this.getOptionsPayloads(attrCodes, relationships);
 
@@ -99,15 +79,59 @@ class OptionsManager {
         return bulk_uuid;
     }
 
-    async setupOptions(attrCodes, relationships) {
+    async _getExistingOptions(parentSku) {
+        const start = process.hrtime();
+        const uri = `/configurable-products/${parentSku}/options/all`;
+
+        console.log('Fetching options:', parentSku);
+        const {data} = await magento.get(uri);
+
+        console.log(`Retrieved options - took ${secondsElapsedSince(start)}s -`, data.length);
+        return data;
+    }
+
+    async _getUnlinkPayload(parentSkus) {
+
+        const jobs = parentSkus.map(async sku => {
+            const options = await this._getExistingOptions(sku);
+            return options.map(o => ({
+                sku: sku,
+                id: o.id
+            }));
+        })
+
+        const payloads = await Promise.all(jobs);
+        return payloads.flat();
+    }
+
+    async _unlinkOptions(parentSkus) {
+        const uri = `/configurable-products/bySku/options/byId`;
+        const payload = await this._getUnlinkPayload(parentSkus);
+
+        console.log('Removing options:', payload.length);
+        const {data: {bulk_uuid}} = await magentoBulk.delete(uri, {
+            data: payload
+        });
+
+        return bulk_uuid;
+    }
+
+    async link(attrCodes, relationships) {
         const start = process.hrtime();
 
-        const bulk_uuid = await this.linkOptions(attrCodes, relationships);
+        const bulk_uuid = await this._linkOptions(attrCodes, relationships);
         console.log(`Bulk options request sent - took ${secondsElapsedSince(start)}s.`);
 
-        await this._isBulkRequestComplete(bulk_uuid);
+        await waitForBulkRequest(bulk_uuid);
+    }
 
-        return 'Ready for linking';
+    async unlink(parentSkus) {
+        const start = process.hrtime();
+
+        const bulk_uuid = await this._unlinkOptions(parentSkus);
+        console.log(`Bulk options request sent - took ${secondsElapsedSince(start)}s.`);
+
+        await waitForBulkRequest(bulk_uuid);
     }
 }
 
