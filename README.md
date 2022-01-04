@@ -35,22 +35,21 @@ should be!
 
 ### Link Options & Variations to Configurable Products
 
+Allows you to link products together using a two column csv file.
+
 - Check `data/attributes.csv` contains all your expected attributes which are used as variations
-- Populate `files/link.csv` with the mappings required e.g. parent_sku + child_sku
-- Run the script by executing:
-    - `yarn link:live`
-    - `yarn link:staging`
-    - `yarn link:local`
+- Populate `data/link.csv` with the variations you want to link e.g. PARENT-SKU-001,CHILD-SKU-101
+- Run the script by executing `link` script with your chosen environment: e.g. `yarn link:staging`
 
 ---
 
 ### Unlink Options & Variations from Configurable Products
 
-- Populate `data/unlink.csv` with the parent_skus you want to clear the options + linked skus from
-- Run the script by executing:
-    - `yarn unlink:live`
-    - `yarn unlink:staging`
-    - `yarn unlink:local`
+Provides the ability to clear all options and variations from configurable products. This will remove ALL options &
+variations from each of the configurable products from the `unlink.csv` file.
+
+- Populate `data/unlink.csv` with the parent_skus you want to clear the options & variations from
+- Run the script by executing `unlink` script with your chosen environment: e.g. `yarn unlink:staging`
 
 ---
 
@@ -60,8 +59,8 @@ Sometimes you need to add new variation attributes to existing configurable prod
 below instructions:
 
 - Follow
-  the [Unlink Options & Variations from Configurable Products](#unlink-options--variations-from-configurable-products) to
-  unlink all existing options from the configurable products
+  the [Unlink Options & Variations from Configurable Products](#unlink-options--variations-from-configurable-products)
+  to unlink all existing options from the configurable products
 - Set up your new variation attributes in Magento & set the desired values on the simple products
 - Update the `data/attributes.csv` file with the `attribute_code`'s of your new attributes that you created in Magento
 - Follow the [Link Options & Variations to Configurable Products](#link-options---variations-to-configurable-products)
