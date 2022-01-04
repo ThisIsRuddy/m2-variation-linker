@@ -9,8 +9,13 @@ This module utilizes the Magento async bulk APIs to offer the simplest way to li
 - Run 'yarn install' to install the required dependencies
 
 ### Setup Environment Variables
-- Copy `.env.sample` to `.env.staging` (or which env you want to use)
-- Update the values to match your env by providing the base URI & required API keys
+- Copy `.env.sample` to a new file where the suffix represents the environment e.g. `.env.staging`
+- Update the values to match your env by providing:
+  - `MAGE_URI` - the url of the Magento store e.g https://daylong.local
+  - `MAGE_TOKEN` - an API Integration key created in the Magento Admin see below permissions e.g. 1i7263kjbh237i32y423h4u7tyj2b34ks
+
+#### Required Magento API Permissions
+![Required Magento API Permissions](https://user-images.githubusercontent.com/1761171/148114088-668f7ecd-5418-4b99-aaba-94f31b8416dd.png)
 
 ### Data & Temp Directory
 - `./data` - contains csv files for you to update, there are samples for each
@@ -34,7 +39,7 @@ This module utilizes the Magento async bulk APIs to offer the simplest way to li
   - `yarn unlink:staging`
   - `yarn unlink:local`
 
-### Add New Variation Attribute to Existing Configurable Products
+### Add New Variation Attributes to Existing Configurable Products
 Sometimes you need to add new variation attributes to existing configurable products. This can be done easily using the below instructions:
 - Follow the [Unlink Options & Variations to Configurable Products](#unlink-options-&-variations-to-configurable-products) to unlink all existing options from the configurable products
 - Set up your new variation attributes in Magento & set the desired values on the simple products
