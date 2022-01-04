@@ -41,6 +41,16 @@ Allows you to link products together using a two column csv file.
 - Populate `data/link.csv` with the variations you want to link e.g. PARENT-SKU-001,CHILD-SKU-101
 - Run the script by executing `link` script with your chosen environment: e.g. `yarn link:staging`
 
+#### Processing Logic
+
+- Ensures all parent products are set up as 'configurable' using bulk API
+- Loads all attribute values for the variation attributes found in the `attributes.csv`
+- Fetches the variation attribute values for all simple products (chunks of 2000)
+- Cross-matches the simple product attribute_values with the variation attribute ids
+- Filters the attribute values for uniques and assigns them as options on the configurable product using the bulk API
+- Waits for the options to be added completely before proceeding to link the variations to the configurable
+- Links the simple products to the configurable after mapping the attribute values and waits for the links to complete
+
 ---
 
 ### Unlink Options & Variations from Configurable Products
@@ -50,6 +60,11 @@ variations from each of the configurable products from the `unlink.csv` file.
 
 - Populate `data/unlink.csv` with the parent_skus you want to clear the options & variations from
 - Run the script by executing `unlink` script with your chosen environment: e.g. `yarn unlink:staging`
+
+#### Processing Logic
+
+- Loops through the parent_sku found in the `unlink.csv' and removes all the existing options - this in-turn removes all
+  the simple products that were linked to the configurable
 
 ---
 
