@@ -16,3 +16,4 @@ data/*
 !data/attributes.sample.csv
 !data/link.sample.csv
 !data/unlink.sample.csv
+temp/*

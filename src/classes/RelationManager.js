@@ -2,6 +2,7 @@ const magentoBulk = require('../lib/magento-bulk');
 
 const secondsElapsedSince = require("../lib/secondsElapsedSince");
 const waitForBulkRequest = require("../lib/waitForBulkRequest");
+const writeJSONFile = require("../lib/writeJSONFile");
 
 class RelationManager {
 
@@ -15,6 +16,8 @@ class RelationManager {
             }));
         }).flat();
 
+        await writeJSONFile("LinkVariationsPayload.json", payload, "Saved the payload for linking variations ./temp/LinkVariationsPayload.json");
+
         console.log('Linking children:', payload.length);
         const {data: {bulk_uuid}} = await magentoBulk.post(uri, payload);
 
@@ -25,7 +28,8 @@ class RelationManager {
         const start = process.hrtime();
         const bulk_uuid = await this._linkVariations(relationships)
 
-        await waitForBulkRequest(bulk_uuid);
+        const response = await waitForBulkRequest(bulk_uuid);
+        await writeJSONFile("LinkVariationsResponse.json", response, "Saved the response from linking variations ./temp/LinkVariationsResponse.json");
 
         console.log(`Retrieved children - took ${secondsElapsedSince(start)}s.`);
         return 'Linking success!';
