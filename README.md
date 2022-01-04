@@ -7,16 +7,15 @@ This is necessary as the existing options for linking are very slow and cumberso
 This module utilizes the Magento async bulk APIs to offer the simplest way to link products - a two column csv - how it
 should be!
 
-## Instructions
+---
 
-- Run 'yarn install' to install the required dependencies
+### Installation & Basics
 
-### Setup Environment Variables
-
+- Run `yarn install` to install the required dependencies
 - Copy `.env.sample` to a new file where the suffix represents the environment e.g. `.env.staging`
 - Update the values to match your environment by providing:
     - `MAGE_URI` - the url of the Magento store e.g https://daylong.local
-    - `MAGE_TOKEN` - an API Integration key created in the Magento Admin see below permissions e.g.
+    - `MAGE_TOKEN` - an API Integration key created in the Magento Admin (see below permissions) e.g.
       1i7263kjbh237i32y423h4u7tyj2b34ks
 
 #### Required Magento API Permissions
@@ -25,12 +24,14 @@ should be!
 
 ### Data & Temp Directory
 
-- `./data` - contains csv files for you to update, there are samples for each
+- `./data` - contains csv files for you to update - there are samples for each of the required csv files see below:
     - `data/attributes.csv` - should contain all the attributes you use for variations e.g. size, colour, length, width
     - `data/link.csv` - should contain 2 columns: `parent_sku` & `sku` and is the list of products you want to link as
       variations
     - `data/unlink.csv` - should contain a list of `parent_sku` in order to remove all variations
 - `./temp` - contains the last bulk API request payloads & bulk status responses for debugging
+
+---
 
 ### Link Options & Variations to Configurable Products
 
@@ -41,7 +42,9 @@ should be!
     - `yarn link:staging`
     - `yarn link:local`
 
-### Unlink Options & Variations to Configurable Products
+---
+
+### Unlink Options & Variations from Configurable Products
 
 - Populate `data/unlink.csv` with the parent_skus you want to clear the options + linked skus from
 - Run the script by executing:
@@ -49,13 +52,15 @@ should be!
     - `yarn unlink:staging`
     - `yarn unlink:local`
 
+---
+
 ### Add New Variation Attributes to Existing Configurable Products
 
 Sometimes you need to add new variation attributes to existing configurable products. This can be done easily using the
 below instructions:
 
 - Follow
-  the [Unlink Options & Variations to Configurable Products](#unlink-options--variations-to-configurable-products) to
+  the [Unlink Options & Variations from Configurable Products](#unlink-options--variations-from-configurable-products) to
   unlink all existing options from the configurable products
 - Set up your new variation attributes in Magento & set the desired values on the simple products
 - Update the `data/attributes.csv` file with the `attribute_code`'s of your new attributes that you created in Magento
