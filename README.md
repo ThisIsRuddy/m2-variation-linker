@@ -44,7 +44,7 @@ Allows you to link products together using a two column csv file.
 #### Processing Logic
 
 - Ensures all parent products are set up as 'configurable' using bulk API
-- Loads all attribute values for the variation attributes found in the `attributes.csv`
+- Loads all attribute values for the variation attributes found in the `attributes.csv` file
 - Fetches the variation attribute values for all simple products (chunks of 2000)
 - Cross-matches the simple product attribute_values with the variation attribute ids
 - Filters the attribute values for uniques and assigns them as options on the configurable product using the bulk API
@@ -63,7 +63,7 @@ variations from each of the configurable products from the `unlink.csv` file.
 
 #### Processing Logic
 
-- Loops through the parent_sku found in the `unlink.csv' and removes all the existing options - this in-turn removes all
+- Loops through the parent_sku found in the `unlink.csv` file and removes all the existing options - this in-turn removes all
   the simple products that were linked to the configurable
 
 ---
