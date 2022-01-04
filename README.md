@@ -58,10 +58,9 @@ variations from each of the configurable products from the `unlink.csv` file.
 Sometimes you need to add new variation attributes to existing configurable products. This can be done easily using the
 below instructions:
 
-- Follow
-  the [Unlink Options & Variations from Configurable Products](#unlink-options--variations-from-configurable-products)
-  to unlink all existing options from the configurable products
+- Follow [Unlink Options & Variations from Configurable Products](#unlink-options--variations-from-configurable-products)
+to unlink all existing options from the configurable products
 - Set up your new variation attributes in Magento & set the desired values on the simple products
 - Update the `data/attributes.csv` file with the `attribute_code`'s of your new attributes that you created in Magento
-- Follow the [Link Options & Variations to Configurable Products](#link-options--variations-to-configurable-products)
+- Follow [Link Options & Variations to Configurable Products](#link-options--variations-to-configurable-products)
   to add all the variations to the configurable products this will add link all the variation attribute options
