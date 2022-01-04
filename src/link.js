@@ -2,6 +2,7 @@ const path = require('path');
 const csv = require('csvtojson');
 
 const secondsElapsedSince = require('./lib/secondsElapsedSince');
+const productsManager = require('./classes/ProductsManager');
 const optionsManager = require('./classes/OptionsManager');
 const relationManager = require('./classes/RelationManager');
 
@@ -48,6 +49,7 @@ const execute = async () => {
     const relationships = await getRelationsFromFile();
     const variationAttrCodes = await getAttributesFromFile();
 
+    await productsManager.convertItems(relationships);
     await optionsManager.link(variationAttrCodes, relationships);
     await relationManager.link(relationships);
 

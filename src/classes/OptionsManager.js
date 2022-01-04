@@ -1,6 +1,7 @@
 const magento = require('../lib/magento');
 const magentoBulk = require('../lib/magento-bulk');
 const toChunks = require("../lib/toChunks");
+const writeJSONFile = require("../lib/writeJSONFile");
 const secondsElapsedSince = require("../lib/secondsElapsedSince");
 const waitForBulkRequest = require("../lib/waitForBulkRequest");
 const attributesRepo = require("../classes/AttributesRepository");
@@ -48,7 +49,7 @@ class OptionsManager {
                     }
                 };
 
-            if (!unique[attrCode].option.values.includes(option.value))
+            if (!unique[attrCode].option.values.some((o => o.value_index === parseInt(option.value))))
                 unique[attrCode].option.values.push({
                     value_index: parseInt(option.value)
                 });
@@ -63,7 +64,7 @@ class OptionsManager {
         return await this._getUniqueOptionsPayload(attrCodes, parentSku, simples);
     }
 
-    async getOptionsPayloads(attrCodes, relationships) {
+    async _getOptionsPayloads(attrCodes, relationships) {
         const jobs = relationships.map(async (r) => await this._getOptionsPayload(attrCodes, r));
         const results = await Promise.all(jobs);
         return results.flat();
@@ -71,7 +72,9 @@ class OptionsManager {
 
     async _linkOptions(attrCodes, relationships) {
         const uri = `/configurable-products/bySku/options`;
-        const payload = await this.getOptionsPayloads(attrCodes, relationships);
+        const payload = await this._getOptionsPayloads(attrCodes, relationships);
+
+        await writeJSONFile("LinkOptionsPayload.json", payload, "Saved the payload for linking options ./temp/LinkOptionsPayload.json");
 
         console.log('Posting options:', relationships.length);
         const {data: {bulk_uuid}} = await magentoBulk.post(uri, payload);
@@ -108,6 +111,8 @@ class OptionsManager {
         const uri = `/configurable-products/bySku/options/byId`;
         const payload = await this._getUnlinkPayload(parentSkus);
 
+        await writeJSONFile("UnlinkOptionsPayload.json", payload, "Saved the payload for unlinking options ./temp/UnlinkOptionsPayload.json");
+
         console.log('Removing options:', payload.length);
         const {data: {bulk_uuid}} = await magentoBulk.delete(uri, {
             data: payload
@@ -122,7 +127,8 @@ class OptionsManager {
         const bulk_uuid = await this._linkOptions(attrCodes, relationships);
         console.log(`Bulk options request sent - took ${secondsElapsedSince(start)}s.`);
 
-        await waitForBulkRequest(bulk_uuid);
+        const response = await waitForBulkRequest(bulk_uuid);
+        await writeJSONFile("LinkOptionsResponse.json", response, "Saved the response from linking options ./temp/LinkOptionsResponse.json");
     }
 
     async unlink(parentSkus) {
@@ -131,7 +137,8 @@ class OptionsManager {
         const bulk_uuid = await this._unlinkOptions(parentSkus);
         console.log(`Bulk options request sent - took ${secondsElapsedSince(start)}s.`);
 
-        await waitForBulkRequest(bulk_uuid);
+        const response = await waitForBulkRequest(bulk_uuid);
+        await writeJSONFile("UnlinkOptionsResponse.json", response, "Saved the response from unlinking options ./temp/UnlinkOptionsResponse.json");
     }
 }
 

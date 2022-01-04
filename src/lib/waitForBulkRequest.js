@@ -6,19 +6,15 @@ const waitForBulkRequest = async (bid) => {
 
     const uri = `/bulk/${bid}/status`;
 
-    const {
-        data: {
-            operations_list
-        }
-    } = await magento.get(uri);
+    const {data} = await magento.get(uri);
 
-    const isDone = !operations_list.some((op) => op.status === 4);
+    const isDone = !data.operations_list.some((op) => op.status === 4);
     if (!isDone) {
         await wait(10000);
         return await waitForBulkRequest(bid);
     }
 
-    return isDone;
+    return data;
 }
 
 module.exports = waitForBulkRequest;
