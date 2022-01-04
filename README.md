@@ -1,4 +1,4 @@
-#### Configurable Relationship Mapper
+#### Configurable Variation Linker/Unlinker
 This module provides functionality to link/unlink configurable products with their variations/simple skus. This is necessary as the existing options for linking are very slow and cumbersome. This module utilizes the Magento async bulk APIs to offer the simplest way to link products - a two column csv - how it should be!
 
 ##### Instructions
