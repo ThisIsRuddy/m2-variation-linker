@@ -3,6 +3,7 @@ const csv = require('csvtojson');
 
 const secondsElapsedSince = require('./lib/secondsElapsedSince');
 const optionsManager = require('./classes/OptionsManager');
+const productsManager = require("./classes/ProductsManager");
 
 const parseCSVFromFile = async (filePath) => {
     const actualFilePath = path.resolve(__dirname + '/' + filePath);
@@ -10,8 +11,7 @@ const parseCSVFromFile = async (filePath) => {
 }
 
 const getParentsFromFile = async () => {
-    const rows = await parseCSVFromFile('../data/unlink.csv');
-    const parents = rows.map((r) => r['parent_sku']);
+    const parents = await parseCSVFromFile('../data/unlink.csv');
     console.log('Parents to reset:', parents.length);
     return parents;
 }
@@ -20,7 +20,8 @@ const execute = async () => {
     const start = process.hrtime();
 
     const parents = await getParentsFromFile();
-    await optionsManager.unlink(parents);
+    await optionsManager.unlink(parents.map(r => r['parent_sku']));
+    await productsManager.convertItems('simple', parents);
 
     console.log(`Finished! - time taken: ${secondsElapsedSince(start)}s.`);
 }

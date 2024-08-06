@@ -49,7 +49,7 @@ const execute = async () => {
     const relationships = await getRelationsFromFile();
     const variationAttrCodes = await getAttributesFromFile();
 
-    await productsManager.convertItems(relationships);
+    await productsManager.convertItems('configurable', relationships);
     await optionsManager.link(variationAttrCodes, relationships);
     await relationManager.link(relationships);
 
