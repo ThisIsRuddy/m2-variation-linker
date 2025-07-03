@@ -43,7 +43,8 @@ class RelationManager {
             const {parentSku, children} = relationConfig;
             for (let childSku of children) {
                 try {
-                    await magento.post(`/configurable-products/${parentSku}/child`, {
+                    const qsParentSku = String(parentSku).replaceAll('/', '%2F');
+                    await magento.post(`/configurable-products/${qsParentSku}/child`, {
                         childSku
                     });
                     console.log(`Link\t${childSku}\t->\t${parentSku}\t=\tSuccess`);
