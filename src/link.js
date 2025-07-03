@@ -15,9 +15,7 @@ const getRelationsFromFile = async () => {
     const rows = await parseCSVFromFile('../data/link.csv');
 
     const results = rows.reduce((acc, curr) => {
-
         const parentSku = curr['parent_sku'];
-
         if (!acc[parentSku]) acc[parentSku] = {
             parentSku,
             children: []
@@ -49,8 +47,9 @@ const execute = async () => {
     const relationships = await getRelationsFromFile();
     const variationAttrCodes = await getAttributesFromFile();
 
-    await productsManager.convertItems(relationships);
+    await productsManager.convertItems('configurable', relationships);
     await optionsManager.link(variationAttrCodes, relationships);
+    //await relationManager.bulkLink(relationships);
     await relationManager.link(relationships);
 
     console.log(`Finished! - time taken: ${secondsElapsedSince(start)}s.`);
