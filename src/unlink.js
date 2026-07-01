@@ -1,5 +1,5 @@
 const path = require('path');
-const csv = require('csvtojson');
+const parseCsvFile = require('./lib/parseCsvFile');
 
 const secondsElapsedSince = require('./lib/secondsElapsedSince');
 const optionsManager = require('./classes/OptionsManager');
@@ -7,7 +7,7 @@ const productsManager = require("./classes/ProductsManager");
 
 const parseCSVFromFile = async (filePath) => {
     const actualFilePath = path.resolve(__dirname + '/' + filePath);
-    return csv().fromFile(actualFilePath);
+    return parseCsvFile(actualFilePath);
 }
 
 const getParentsFromFile = async () => {

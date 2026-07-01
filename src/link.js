@@ -1,12 +1,12 @@
 const path = require('path');
-const csv = require('csvtojson');
+const parseCsvFile = require('./lib/parseCsvFile');
 
 const secondsElapsedSince = require('./lib/secondsElapsedSince');
 const variationLinker = require('./classes/VariationLinker');
 
 const parseCSVFromFile = async (filePath) => {
     const actualFilePath = path.resolve(__dirname + '/' + filePath);
-    return csv().fromFile(actualFilePath);
+    return parseCsvFile(actualFilePath);
 }
 
 const getRelationsFromFile = async () => {
@@ -15,7 +15,7 @@ const getRelationsFromFile = async () => {
     const linkFile = process.env.LINK_FILE
         ? path.resolve(process.cwd(), process.env.LINK_FILE)
         : path.resolve(__dirname, '../data/link.csv');
-    const rows = await csv().fromFile(linkFile);
+    const rows = await parseCsvFile(linkFile);
     console.log('Link file:', linkFile);
 
     const results = rows.reduce((acc, curr) => {
