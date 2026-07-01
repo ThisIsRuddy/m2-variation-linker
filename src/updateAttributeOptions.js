@@ -1,52 +1,35 @@
 const path = require('path');
+
 const parseCsvFile = require('./lib/parseCsvFile');
-
 const secondsElapsedSince = require('./lib/secondsElapsedSince');
-const attributesRepo = require('./classes/AttributesRepository');
-
-const parseCSVFromFile = async (filePath) => {
-    const actualFilePath = path.resolve(__dirname + '/' + filePath);
-    return parseCsvFile(actualFilePath);
-}
+const runAttributeOptions = require('./operations/attributeOptionsBatch');
+const { updateOption } = require('./operations/attributes');
 
 const execute = async () => {
     const start = process.hrtime();
 
-    const attributeOptions = await parseCSVFromFile('../data/update-attribute-options.csv');
-    console.log('Attribute options to update:', attributeOptions.length);
+    const rows = await parseCsvFile(
+        path.resolve(__dirname, '../data/update-attribute-options.csv'),
+    );
+    console.log('Attribute options to update:', rows.length);
 
-    const results = {
-        errors: [],
-        success: 0,
-        error: 0,
-        total: attributeOptions.length,
-    }
-    for (const option of attributeOptions) {
-        try {
-            console.log('Saving colour option:', option.attribute_code, option.label, option.value);
-            await attributesRepo._updateAttributeOption(
-                option.attribute_code,
-                option.sort_order,
-                option.label,
-                option.front_label,
-                option.value,
-                option.option_id
-            );
-            results.success++;
-        } catch (e) {
-            console.error(e.message);
-            results.error++;
-            results.errors.push({
-                option,
-                error: e.message,
-            })
-        }
-    }
+    await runAttributeOptions(rows, (row) =>
+        updateOption(
+            row.attribute_code,
+            row.sort_order,
+            row.label,
+            row.front_label,
+            row.value,
+            row.option_id,
+        ),
+    );
 
-    console.log(JSON.stringify(results, null, 2));
     console.log(`Finished! - time taken: ${secondsElapsedSince(start)}s.`);
-}
+};
 
 execute()
-    .catch(err => console.error(err))
-    .finally(() => process.exit(0));
+    .then(() => process.exit(0))
+    .catch((err) => {
+        console.error(err);
+        process.exit(1);
+    });

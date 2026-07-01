@@ -5,6 +5,6 @@ const toChunks = (arr, chunkSize) => {
         res.push(chunk);
     }
     return res;
-}
+};
 
 module.exports = toChunks;

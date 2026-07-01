@@ -4,8 +4,8 @@ This module provides functionality to link/unlink configurable products with the
 
 This is necessary as the existing options for linking are very slow and cumbersome.
 
-This module utilizes the Magento async bulk APIs to offer the simplest way to link products - a two column csv - how it
-should be!
+Linking uses one synchronous save per parent product (for correctness under concurrency); unlinking uses the Magento
+async bulk API. Either way the input is a simple csv - the simplest way to link products, how it should be!
 
 ---
 
@@ -29,7 +29,10 @@ should be!
     - `data/link.csv` - should contain 2 columns: `parent_sku` & `sku` and is the list of products you want to link as
       variations
     - `data/unlink.csv` - should contain a list of `parent_sku` in order to remove all variations
-- `./temp` - contains the last bulk API request payloads & bulk status responses for debugging
+    - `data/create-attribute-options.csv` - options to create (columns: `attribute_code`, `sort_order`, `label`,
+      `front_label`, `value`)
+    - `data/update-attribute-options.csv` - options to update (same columns plus `option_id`)
+- `./temp` - contains the last request payloads & responses (link report, bulk status) for debugging
 
 ---
 
@@ -43,13 +46,16 @@ Allows you to link products together using a two column csv file.
 
 #### Processing Logic
 
-- Ensures all parent products are set up as 'configurable' using bulk API
-- Loads all attribute values for the variation attributes found in the `attributes.csv` file
-- Fetches the variation attribute values for all simple products (chunks of 2000)
-- Cross-matches the simple product attribute_values with the variation attribute ids
-- Filters the attribute values for uniques and assigns them as options on the configurable product using the bulk API
-- Waits for the options to be added completely before proceeding to link the variations to the configurable
-- Links the simple products to the configurable after mapping the attribute values and waits for the links to complete
+- Fetches the variation attribute values for all child simple products (chunks of 100)
+- Loads metadata for each variation attribute in `attributes.csv` (fetched once, then cached for the run)
+- Builds the unique set of option value indexes across the children
+- Saves each parent in ONE synchronous request that sets the type to 'configurable', its configurable options and all
+  child links together
+- Runs up to 5 parents concurrently and writes a per-parent report to `./temp/LinkReport.json`
+
+> The single synchronous save per parent is deliberate: the async bulk queue processes the options and add-child steps
+> for a parent concurrently, and both do a read-modify-write of the same product, causing intermittent
+> "duplicate variation option" errors. One save per parent removes that race.
 
 ---
 
@@ -63,8 +69,9 @@ variations from each of the configurable products from the `unlink.csv` file.
 
 #### Processing Logic
 
-- Loops through the parent_sku found in the `unlink.csv` file and removes all the existing options - this in-turn removes all
-  the simple products that were linked to the configurable
+- Removes all configurable options from each parent (bulk API) - this in-turn unlinks the simple products that were
+  linked to the configurable
+- Converts each parent's product type back to 'simple' (bulk API)
 
 ---
 
@@ -79,3 +86,15 @@ to unlink all existing options from the configurable products
 - Update the `data/attributes.csv` file with the `attribute_code`'s of your new attributes that you created in Magento
 - Follow [Link Options & Variations to Configurable Products](#link-options--variations-to-configurable-products)
   to add all the variations to the configurable products this will add link all the variation attribute options
+
+---
+
+### Create / Update Attribute Options
+
+Bulk-create or update the selectable options on an attribute (e.g. add new colours or sizes) directly from a csv.
+
+- To create options: populate `data/create-attribute-options.csv` and run `yarn attributes:create:staging`
+- To update existing options: populate `data/update-attribute-options.csv` (include the `option_id` of each option to
+  change) and run `yarn attributes:update:staging`
+
+Each row is processed independently; a failing row is logged and counted but does not abort the batch.
