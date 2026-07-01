@@ -1,10 +1,10 @@
-const axios = require('axios');
+const { createClient } = require('./httpClient');
 
-const instance = axios.create({
-    baseURL: process.env.MAGE_URI + '/rest/V1',
-    headers: {
-        'Authorization': 'Bearer ' + process.env.MAGE_TOKEN
-    }
-});
+// Two clients sharing the same auth: the synchronous REST API and the
+// asynchronous bulk API. Both read config from the environment at load time.
+const headers = { Authorization: 'Bearer ' + process.env.MAGE_TOKEN };
 
-module.exports = instance;
+const api = createClient({ baseURL: process.env.MAGE_URI + '/rest/V1', headers });
+const bulk = createClient({ baseURL: process.env.MAGE_URI + '/rest/async/bulk/V1', headers });
+
+module.exports = { api, bulk };

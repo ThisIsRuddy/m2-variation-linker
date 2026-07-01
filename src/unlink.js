@@ -1,31 +1,28 @@
 const path = require('path');
-const csv = require('csvtojson');
 
+const parseCsvFile = require('./lib/parseCsvFile');
 const secondsElapsedSince = require('./lib/secondsElapsedSince');
-const optionsManager = require('./classes/OptionsManager');
-const productsManager = require("./classes/ProductsManager");
+const variationUnlinker = require('./operations/variationUnlinker');
 
-const parseCSVFromFile = async (filePath) => {
-    const actualFilePath = path.resolve(__dirname + '/' + filePath);
-    return csv().fromFile(actualFilePath);
-}
-
-const getParentsFromFile = async () => {
-    const parents = await parseCSVFromFile('../data/unlink.csv');
-    console.log('Parents to reset:', parents.length);
-    return parents;
-}
+const getParentSkusFromFile = async () => {
+    const rows = await parseCsvFile(path.resolve(__dirname, '../data/unlink.csv'));
+    const parentSkus = rows.map((row) => row['parent_sku']);
+    console.log('Parents to reset:', parentSkus.length);
+    return parentSkus;
+};
 
 const execute = async () => {
     const start = process.hrtime();
 
-    const parents = await getParentsFromFile();
-    await optionsManager.unlink(parents.map(r => r['parent_sku']));
-    await productsManager.convertItems('simple', parents);
+    const parentSkus = await getParentSkusFromFile();
+    await variationUnlinker.unlink(parentSkus);
 
     console.log(`Finished! - time taken: ${secondsElapsedSince(start)}s.`);
-}
+};
 
 execute()
-    .catch(err => console.error(err))
-    .finally(() => process.exit(0));
+    .then(() => process.exit(0))
+    .catch((err) => {
+        console.error(err);
+        process.exit(1);
+    });
