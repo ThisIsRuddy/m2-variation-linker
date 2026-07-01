@@ -4,7 +4,7 @@
  * on so the Magento clients and their call sites stay unchanged:
  *
  *   - instance methods: get(url), post(url, data), put(url, data), delete(url, {data})
- *   - resolves to `{ data, status, statusText, headers }` with `data` parsed as JSON
+ *   - resolves to `{ data }` with `data` parsed as JSON
  *   - rejects on non-2xx with an error carrying `err.response.{data,status,statusText}`
  *   - JSON-serialises request bodies and sets `Content-Type: application/json`
  */
@@ -40,17 +40,11 @@ const request = async (baseURL, defaultHeaders, method, url, config = {}) => {
             data: body,
             status: response.status,
             statusText: response.statusText,
-            headers: response.headers,
         };
         throw error;
     }
 
-    return {
-        data: body,
-        status: response.status,
-        statusText: response.statusText,
-        headers: response.headers,
-    };
+    return { data: body };
 };
 
 /**

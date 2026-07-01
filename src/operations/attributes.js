@@ -29,13 +29,11 @@ const buildOption = (sortNo, label, frontLabel, value) => ({
 const createOption = async (attrCode, sortNo, label, frontLabel, value) => {
     const uri = `/products/attributes/${attrCode}/options`;
     await api.post(uri, buildOption(sortNo, label, frontLabel, value));
-    cache.delete(attrCode); // options changed; drop any stale metadata
 };
 
 const updateOption = async (attrCode, sortNo, label, frontLabel, value, optionId) => {
     const uri = `/products/attributes/${attrCode}/options/${optionId}`;
     await api.put(uri, buildOption(sortNo, label, frontLabel, value));
-    cache.delete(attrCode);
 };
 
 module.exports = { getAttribute, createOption, updateOption };

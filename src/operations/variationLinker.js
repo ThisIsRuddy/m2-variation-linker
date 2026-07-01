@@ -1,5 +1,4 @@
 const { api } = require('../lib/magento');
-const toChunks = require('../lib/toChunks');
 const secondsElapsedSince = require('../lib/secondsElapsedSince');
 const writeJSONFile = require('../lib/writeJSONFile');
 const { getAttribute } = require('./attributes');
@@ -42,7 +41,8 @@ const errMsg = (err) => {
  */
 const getSimpleProducts = async (skus) => {
     const items = [];
-    for (const chunk of toChunks(skus, 100)) {
+    for (let i = 0; i < skus.length; i += 100) {
+        const chunk = skus.slice(i, i + 100);
         const value = encodeURIComponent(chunk.join(','));
         const uri =
             `/products/` +

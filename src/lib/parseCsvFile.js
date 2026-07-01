@@ -93,4 +93,3 @@ const parseCsvFile = async (filePath) => {
 };
 
 module.exports = parseCsvFile;
-module.exports.parseCsv = parseCsv;
