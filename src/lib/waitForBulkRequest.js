@@ -1,17 +1,19 @@
 const magento = require("../lib/magento");
 const wait = require("../lib/wait");
 
-const waitForBulkRequest = async (bid) => {
-    console.log('Checking bulk relation request:', bid);
+const waitForBulkRequest = async (bid, progress) => {
+    console.log('Checking bulk request:', bid, progress ? progress : '');
 
-    const uri = `/bulk/${bid}/status`;
+    const {data} = await magento.get(`/bulk/${bid}/status`);
 
-    const {data} = await magento.get(uri);
+    const stillToProcess = data.operations_list.reduce((acc, operation) => {
+        if (operation.status === 4) acc++;
+        return acc;
+    }, 0)
 
-    const isDone = !data.operations_list.some((op) => op.status === 4);
-    if (!isDone) {
+    if (stillToProcess > 0) {
         await wait(10000);
-        return await waitForBulkRequest(bid);
+        return await waitForBulkRequest(bid, `[${data.operation_count - stillToProcess}/${data.operation_count}] ${(((data.operation_count - stillToProcess) / data.operation_count) * 100).toFixed(0)}%`);
     }
 
     return data;

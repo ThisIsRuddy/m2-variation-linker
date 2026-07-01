@@ -2,9 +2,7 @@ const path = require('path');
 const csv = require('csvtojson');
 
 const secondsElapsedSince = require('./lib/secondsElapsedSince');
-const productsManager = require('./classes/ProductsManager');
-const optionsManager = require('./classes/OptionsManager');
-const relationManager = require('./classes/RelationManager');
+const variationLinker = require('./classes/VariationLinker');
 
 const parseCSVFromFile = async (filePath) => {
     const actualFilePath = path.resolve(__dirname + '/' + filePath);
@@ -12,7 +10,13 @@ const parseCSVFromFile = async (filePath) => {
 }
 
 const getRelationsFromFile = async () => {
-    const rows = await parseCSVFromFile('../data/link.csv');
+    // Default to data/link.csv, but allow overriding per batch without
+    // clobbering the file, e.g. LINK_FILE=data/link-juzo.csv yarn link:prod
+    const linkFile = process.env.LINK_FILE
+        ? path.resolve(process.cwd(), process.env.LINK_FILE)
+        : path.resolve(__dirname, '../data/link.csv');
+    const rows = await csv().fromFile(linkFile);
+    console.log('Link file:', linkFile);
 
     const results = rows.reduce((acc, curr) => {
         const parentSku = curr['parent_sku'];
@@ -47,10 +51,9 @@ const execute = async () => {
     const relationships = await getRelationsFromFile();
     const variationAttrCodes = await getAttributesFromFile();
 
-    await productsManager.convertItems('configurable', relationships);
-    await optionsManager.link(variationAttrCodes, relationships);
-    //await relationManager.bulkLink(relationships);
-    await relationManager.link(relationships);
+    // One synchronous save per parent (type + options + links together).
+    // See VariationLinker for why this replaces the old 3-pass bulk pipeline.
+    await variationLinker.link(variationAttrCodes, relationships);
 
     console.log(`Finished! - time taken: ${secondsElapsedSince(start)}s.`);
 }

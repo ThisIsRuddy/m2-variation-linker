@@ -12,8 +12,8 @@ const parseCSVFromFile = async (filePath) => {
 const execute = async () => {
     const start = process.hrtime();
 
-    const attributeOptions = await parseCSVFromFile('../data/create-attribute-options.csv');
-    console.log('Attribute options to create/update:', attributeOptions.length);
+    const attributeOptions = await parseCSVFromFile('../data/update-attribute-options.csv');
+    console.log('Attribute options to update:', attributeOptions.length);
 
     const results = {
         errors: [],
@@ -23,13 +23,14 @@ const execute = async () => {
     }
     for (const option of attributeOptions) {
         try {
-            console.log('Saving attribute option:', option.attribute_code, option.label, option.value);
-            await attributesRepo._createAttributeOption(
+            console.log('Saving colour option:', option.attribute_code, option.label, option.value);
+            await attributesRepo._updateAttributeOption(
                 option.attribute_code,
                 option.sort_order,
                 option.label,
                 option.front_label,
-                option.value
+                option.value,
+                option.option_id
             );
             results.success++;
         } catch (e) {

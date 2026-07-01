@@ -32,7 +32,31 @@ class RelationManager {
         const response = await waitForBulkRequest(bulk_uuid);
         await writeJSONFile("LinkVariationsResponse.json", response, "Saved the response from linking variations ./temp/LinkVariationsResponse.json");
 
-        console.log(`Retrieved children - took ${secondsElapsedSince(start)}s.`);
+        const results = response.operations_list.reduce((acc, curr) => {
+            acc.totals.total++;
+
+            if (curr.status === 4)
+                acc.totals.pending++;
+            else if (curr.status === 1 || curr.status === 3 && curr.result_message === 'The product is already attached.')
+                acc.totals.ok++;
+            else {
+                acc.totals.errors++;
+                acc.errors[curr.result_message] = !acc.errors[curr.result_message] ? 1 : acc.errors[curr.result_message]++;
+            }
+
+            return acc;
+        }, {
+            totals: {
+                pending: 0,
+                ok: 0,
+                errors: 0,
+                total: 0
+            },
+            errors: {}
+        });
+
+        console.log(`Bulk Link - took ${secondsElapsedSince(start)}s.`);
+        console.log(JSON.stringify(results, null, 2));
         return 'Linking success!';
     }
 

@@ -15,12 +15,45 @@ class AttributesRepository {
         this._map.set(attrCode, data);
     }
 
-    async _createAttribute(attrCode, attrLabel, attrValue) {
+    async _createAttributeOption(attrCode, sortNo, label, frontLabel, value) {
         const uri = `/products/attributes/${attrCode}/options`;
         const {data} = await magento.post(uri, {
             option: {
-                label: attrLabel,
-                value: attrValue
+                label,
+                value,
+                sort_order: sortNo,
+                store_labels: [
+                    {
+                        "store_id": 1,
+                        "label": frontLabel,
+                    },
+                    {
+                        "store_id": 2,
+                        "label": frontLabel,
+                    }
+                ]
+            }
+        });
+        this._map.set(attrCode, data);
+    }
+
+    async _updateAttributeOption(attrCode, sortNo, label, frontLabel, value, optionId) {
+        const uri = `/products/attributes/${attrCode}/options/${optionId}`;
+        const {data} = await magento.put(uri, {
+            option: {
+                label,
+                value,
+                sort_order: sortNo,
+                store_labels: [
+                    {
+                        "store_id": 1,
+                        "label": frontLabel,
+                    },
+                    {
+                        "store_id": 2,
+                        "label": frontLabel,
+                    }
+                ]
             }
         });
         this._map.set(attrCode, data);
