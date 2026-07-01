@@ -1,6 +1,6 @@
-const axios = require('axios');
+const { createClient } = require('./httpClient');
 
-const instance = axios.create({
+const instance = createClient({
     baseURL: process.env.MAGE_URI + '/rest/V1',
     headers: {
         'Authorization': 'Bearer ' + process.env.MAGE_TOKEN
