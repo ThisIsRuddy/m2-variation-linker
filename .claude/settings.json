@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__chrome-devtools__*",
+      "mcp__phpstorm__*",
+      "WebFetch(domain:www.daylong.co.uk)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:daylong.co.uk)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "chrome-devtools",
+    "phpstorm"
+  ]
+}
